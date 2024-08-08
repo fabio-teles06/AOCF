@@ -2,42 +2,42 @@
 #include <aocf/aocf_platform.h>
 #include <aocf/aocf_gl.h>
 
+#include <iostream>
+
 namespace AOCF
 {
-    enum RenderAPIName
-    {
-        NONE = 0,
-        OPENGL = 1,
-    };
-
-    struct OpenGL
-    {
-        HGLRC rc;
-        unsigned int versionMajor;
-        unsigned int versionMinor;
-        PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB;
-        PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
-        int pixelFormatAttribs[16];
-        int contextAttribs[16];
-    };
-
-    struct RenderAPIInfo
-    {
-        RenderAPIName name;
-        OpenGL gl;
-    };
-
-    RenderAPIInfo renderApiInfo;
+    const int AOCF_CLOSE_WINDOW = WM_USER + 1;
 
     struct Window
     {
         HWND handle;
         bool shouldClose;
         HDC dc;
-        //
+        HGLRC rc;
     };
 
-    const int AOCF_CLOSE_WINDOW = WM_USER + 1;
+    static struct RenderAPIInfo
+    {
+        enum RenderAPIName
+        {
+            NONE = 0,
+            OPENGL = 1,
+        };
+
+        struct OpenGL
+        {
+            HGLRC sharedContext;
+            unsigned int versionMajor;
+            unsigned int versionMinor;
+            PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB;
+            PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
+            int pixelFormatAttribs[16];
+            int contextAttribs[16];
+        };
+
+        RenderAPIName name;
+        OpenGL gl;
+    } globalRenderApiInfo;
 
     LRESULT aocfWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
@@ -119,21 +119,18 @@ namespace AOCF
             WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
             0};
 
-        renderApiInfo.name = RenderAPIName::OPENGL;
-        renderApiInfo.gl.versionMajor = major;
-        renderApiInfo.gl.versionMinor = minor;
-        renderApiInfo.gl.wglChoosePixelFormatARB = (PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
-        renderApiInfo.gl.wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
-        memcpy(renderApiInfo.gl.pixelFormatAttribs, PixelFormatAttribList, sizeof(PixelFormatAttribList));
-        memcpy(renderApiInfo.gl.contextAttribs, ContextAttribList, sizeof(ContextAttribList));
+        globalRenderApiInfo.name = globalRenderApiInfo.OPENGL;
+        globalRenderApiInfo.gl.sharedContext = 0;
+        globalRenderApiInfo.gl.versionMajor = major;
+        globalRenderApiInfo.gl.versionMinor = minor;
+        globalRenderApiInfo.gl.wglChoosePixelFormatARB = (PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
+        globalRenderApiInfo.gl.wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
+        memcpy(globalRenderApiInfo.gl.pixelFormatAttribs, PixelFormatAttribList, sizeof(PixelFormatAttribList));
+        memcpy(globalRenderApiInfo.gl.contextAttribs, ContextAttribList, sizeof(ContextAttribList));
 
         wglMakeCurrent(0, 0);
         wglDeleteContext(rc);
         destroyWindow(dummyWindow);
-
-        // LoadGLFunctions
-        getOpenGLFunctionPointers();
-
         return true;
     }
 
@@ -178,19 +175,25 @@ namespace AOCF
         window->shouldClose = false;
         window->dc = GetDC(windowHandle);
 
-        if (renderApiInfo.name == RenderAPIName::OPENGL)
+        if (globalRenderApiInfo.name == globalRenderApiInfo.OPENGL)
         {
             int pixelFormat;
             int numPixelFormats = 0;
             PIXELFORMATDESCRIPTOR pfd;
 
-            const int *pixelFormatAttribList = (const int *)renderApiInfo.gl.pixelFormatAttribs;
-            const int *contextAttribList = (const int *)renderApiInfo.gl.contextAttribs;
+            const int *pixelFormatAttribList = (const int *)globalRenderApiInfo.gl.pixelFormatAttribs;
+            const int *contextAttribList = (const int *)globalRenderApiInfo.gl.contextAttribs;
 
-            renderApiInfo.gl.wglChoosePixelFormatARB(window->dc, pixelFormatAttribList, nullptr, 1, &pixelFormat, (UINT *)&numPixelFormats);
+            globalRenderApiInfo.gl.wglChoosePixelFormatARB(window->dc,
+                                                           pixelFormatAttribList,
+                                                           nullptr,
+                                                           1,
+                                                           &pixelFormat,
+                                                           (UINT *)&numPixelFormats);
+
             if (numPixelFormats <= 0)
             {
-                // LOGERROR("Unable to get a valid pixel format");
+                // LOGERROR("Unable to find a suitable pixel format");
                 return nullptr;
             }
 
@@ -200,21 +203,33 @@ namespace AOCF
                 return nullptr;
             }
 
-            HGLRC rc = renderApiInfo.gl.wglCreateContextAttribsARB(window->dc, 0, contextAttribList);
+            HGLRC sharedContext = globalRenderApiInfo.gl.sharedContext;
+            HGLRC rc = globalRenderApiInfo.gl.wglCreateContextAttribsARB(window->dc, sharedContext, contextAttribList);
+
+            bool mustGetGLFunctions = false;
+            if (!sharedContext)
+            {
+                globalRenderApiInfo.gl.sharedContext = rc;
+                mustGetGLFunctions = true;
+            }
+
             if (!rc)
             {
                 // LOGERROR("Unable to create a valid OpenGL context");
                 return nullptr;
             }
 
-            renderApiInfo.gl.rc = rc;
-            if (!wglMakeCurrent(window->dc, rc))
+            window->rc = rc;
+            if (!wglMakeCurrent(window->dc, window->rc))
             {
                 // LOGERROR("Unable to set OpenGL context current");
                 return nullptr;
             }
 
-            glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+            if (mustGetGLFunctions)
+            {
+                getOpenGLFunctionPointers();
+            }
         }
 
         return window;
@@ -222,17 +237,21 @@ namespace AOCF
 
     void Platform::destroyWindow(Window *window)
     {
-        if (window)
-        {
-            DestroyWindow(window->handle);
-            delete window;
-        }
+        wglDeleteContext(window->rc);
+        DeleteDC(window->dc);
+        DestroyWindow(window->handle);
+        delete window;
     }
 
     void Platform::pollEvents(Window *window)
     {
         MSG msg = {};
         HWND hwnd = window->handle;
+
+        if (globalRenderApiInfo.name == globalRenderApiInfo.OPENGL)
+        {
+            wglMakeCurrent(window->dc, window->rc);
+        }
 
         while (PeekMessage(&msg, hwnd, 0, 0, PM_REMOVE))
         {
