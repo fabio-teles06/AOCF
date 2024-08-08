@@ -6,6 +6,16 @@
 
 namespace AOCF
 {
+    /*
+    * Windows specific implementation
+
+    * The following code is a Windows specific implementation of the Platform class.
+    * It uses the Windows API to create and manage windows, and the OpenGL API to create and manage OpenGL contexts.
+    * The implementation is based on the Win32 API and the WGL API.
+    * The implementation is not intended to be used directly, but rather to be used as a reference for other platform implementations.
+    * The implementation is not complete and may require additional functionality to be added.
+    */
+
     const int AOCF_CLOSE_WINDOW = WM_USER + 1;
 
     struct Window

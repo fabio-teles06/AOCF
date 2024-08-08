@@ -7,22 +7,14 @@ string(TOLOWER ${CMAKE_SYSTEM_NAME} PLATFORM)
 if (PLATFORM STREQUAL "windows")
     set(PLATFORM "win64")
 elseif(PLATFORM STREQUAL "linux")
-    set(PLATFORM "linux")
+    set(PLATFORM "x11")
 endif()
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_library(AOCF SHARED 
-    src/aocf_platform_${PLATFORM}.cpp
-    src/aocf_gl.cpp
+src/aocf_platform_${PLATFORM}.cpp
+src/aocf_gl.cpp
 )
-target_link_libraries(AOCF PRIVATE opengl32)
-
+target_include_directories(AOCF PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_compile_definitions(AOCF PRIVATE AOCF_EXPORTS)
-
-
-# executable example
-add_executable(example
-    example/main.cpp
-)
-target_link_libraries(example AOCF opengl32)
+target_link_libraries(AOCF PRIVATE opengl32)
