@@ -1,6 +1,6 @@
 # AOCF
-AOCF ou Another OpenGL Context Framework, como o nome já diz é um biblioteca para criação de janela e contexto opengl
-atualmente tenho como objetivo apenas o contexto opengl, mas posso criar mais funcionalidades como áudio, manipulação de arquivo e etc.
+AOCF ou Another OpenGL Context Framework, como o nome já diz é um biblioteca para criação de janela e contexto opengl.
+Atualmente tenho como objetivo apenas o contexto opengl, mas posso criar mais funcionalidades como áudio, manipulação de arquivo e etc.
 
 De forma resumida, por enquanto quero criar algo como GLFW mas no futuro quero fazer algo como SDL.
 
