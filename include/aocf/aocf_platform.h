@@ -35,4 +35,4 @@ namespace AOCF
     };
 }
 
-#endif
+#endif // AOCF_PLATFORM_H
