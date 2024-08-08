@@ -115,6 +115,11 @@ int main()
         AOCF::Platform::swapBuffers(w);
     }
 
+    glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(1, &vbo);
+    glDeleteBuffers(1, &ibo);
+
+    glDeleteProgram(shaderProgram);
     AOCF::Platform::destroyWindow(w);
 
     return 0;
