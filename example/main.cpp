@@ -1,19 +1,20 @@
-#include <aocf_platform.h>
+#include <aocf/aocf_platform.h>
+#include <aocf/aocf_gl.h>
 
 int main()
 {
+    AOCF::Platform::initOpenGL(3, 2);
     AOCF::Window *w = AOCF::Platform::createWindow(800, 600, "AOCF Window");
 
-    //timer
+    // timer
     int lastTime = AOCF::Platform::getTime();
     while (!AOCF::Platform::getShouldClose(w))
     {
-        AOCF::Platform::pollEvents();
+        AOCF::Platform::pollEvents(w);
 
-        if (AOCF::Platform::getTime() - lastTime > 1000)
-        {
-            AOCF::Platform::setShouldClose(w, true);
-        }
+        
+
+        AOCF::Platform::swapBuffers(w);
     }
 
     return 0;

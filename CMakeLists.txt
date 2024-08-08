@@ -14,7 +14,9 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_library(AOCF SHARED 
     src/aocf_platform_${PLATFORM}.cpp
+    src/aocf_gl.cpp
 )
+target_link_libraries(AOCF PRIVATE opengl32)
 
 target_compile_definitions(AOCF PRIVATE AOCF_EXPORTS)
 
@@ -23,4 +25,4 @@ target_compile_definitions(AOCF PRIVATE AOCF_EXPORTS)
 add_executable(example
     example/main.cpp
 )
-target_link_libraries(example AOCF)
+target_link_libraries(example AOCF opengl32)
