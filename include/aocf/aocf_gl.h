@@ -1,5 +1,4 @@
-#ifndef AOCF_GL
-#define AOCF_GL
+#pragma once
 
 #include <aocf/aocf.h>
 #include <gl/glcorearb.h>
@@ -1302,5 +1301,3 @@ namespace AOCF
     void getOpenGLFunctionPointers();
 }
 #endif
-
-#endif // AOCF_GL

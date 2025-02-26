@@ -1,5 +1,6 @@
 #include <aocf/aocf.h>
 #include <aocf/aocf_platform.h>
+#include <aocf/aocf_keyboard.h>
 #include <aocf/aocf_gl.h>
 
 #include <iostream>
@@ -49,6 +50,8 @@ namespace AOCF
         OpenGL gl;
     } globalRenderApiInfo;
 
+    static KeyboardState globalKeyboardState;
+
     LRESULT aocfWindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
         switch (msg)
@@ -56,6 +59,16 @@ namespace AOCF
         case WM_CLOSE:
             PostMessageA(hwnd, AOCF_CLOSE_WINDOW, 0, 0);
             break;
+        case WM_KEYDOWN:
+        case WM_KEYUP:
+        {
+            int32 isDown = !(lParam & (1 << 31)); //0 = pressed, 1 = released
+            int32 wasDown = (lParam & (1 << 30)) != 0;
+            int32 state = (((isDown ^ wasDown) << 1) | isDown);
+            int16 vkCode = (int16) wParam;
+            // LOGINFO("Key: %d, State: %d", vkCode, state);
+            globalKeyboardState.key[vkCode] = (uint8) state;
+        }
         default:
         {
             return DefWindowProc(hwnd, msg, wParam, lParam);
@@ -296,4 +309,7 @@ namespace AOCF
         return GetTickCount();
     }
 
+    const KeyboardState* Platform::getKeyboardState(){
+        return &globalKeyboardState;
+    }
 }

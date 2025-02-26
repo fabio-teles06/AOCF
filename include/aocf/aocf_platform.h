@@ -1,5 +1,4 @@
-#ifndef PLATFORM_H
-#define PLATFORM_H
+#pragma once
 
 #include <aocf/aocf.h>
 
@@ -8,21 +7,12 @@
 #include <windowsx.h>
 #endif
 
-#ifdef PLATFORM_WINDOWS
-#ifdef AOCF_EXPORTS
-#define PLATFORM_API __declspec(dllexport)
-#else
-#define PLATFORM_API __declspec(dllimport)
-#endif // AOCF_EXPORTS
-#else
-#define PLATFORM_API
-#endif // PLATFORM_WINDOWS
-
 namespace AOCF
 {
     struct Window;
+    struct KeyboardState;
 
-    struct PLATFORM_API Platform final
+    struct AOCF_API Platform final
     {
         static Window *createWindow(int32 width, int32 height, const char *title);
         static void destroyWindow(Window *window);
@@ -32,7 +22,8 @@ namespace AOCF
         static bool getShouldClose(Window *window);
         static void setShouldClose(Window *window, bool shouldClose);
         static int getTime();
+
+        static const KeyboardState *getKeyboardState();
+
     };
 }
-
-#endif // AOCF_PLATFORM_H
