@@ -1,20 +1,76 @@
-# AOCF
-AOCF ou Another OpenGL Context Framework, como o nome já diz é um biblioteca para criação de janela e contexto opengl.
-Atualmente tenho como objetivo apenas o contexto opengl, mas posso criar mais funcionalidades como áudio, manipulação de arquivo e etc.
+# AOCF - Another OpenGL Context Framework
 
-De forma resumida, por enquanto quero criar algo como GLFW mas no futuro quero fazer algo como SDL.
+**AOCF** (Another OpenGL Context Framework) é uma biblioteca simples e leve para criação de janelas e gerenciamento de contexto OpenGL.  
+O objetivo inicial é oferecer algo semelhante ao [GLFW](https://www.glfw.org/), com uma API simples, clara e fácil de integrar em projetos C/C++ modernos.  
+No futuro, planejo expandir as funcionalidades, tornando o AOCF mais próximo de algo como a [SDL](https://www.libsdl.org/), com suporte a áudio, entrada e manipulação de arquivos.
 
-### pros:
- - nenhum por enquanto, mas pretendo fazer o mais simples e fácil de entender.
-### cons:
- - ainda não está feito.
- - não é melhor que os concorrentes.
+---
 
-## Porque você usaria?
-Não sei, você escolhe se usaria ou não, sou um programador novo, estou criando isso para uso próprio e para aprender.
+## ✨ Objetivo
 
-## Final
-Pretendo fazer atualmente suporte para windows e linux, mas caso alguém queira fazer para Mac ou adicionar uma nova funcionalidade, sinta-se à vontade.
-Crie uma branch, faça alteração e crie um pull-request, eu irei avaliar e fazer os testes e então integrar com o código final.
+Desenvolver uma biblioteca multiplataforma para criação de janelas e contexto OpenGL, voltada inicialmente para **uso pessoal e aprendizado**.  
+Apesar de ser um projeto educacional, o código é escrito com qualidade e com foco em ser compreensível e de fácil manutenção.
 
-Estou aberto para sugestões. :)
+---
+
+## ✅ Funcionalidades
+
+### Contexto OpenGL
+- ✅ Criação de janelas (Windows e Linux)
+- ✅ Criação de contexto OpenGL
+- ✅ Loop de renderização (eventos + swap buffers)
+- 🔜 Suporte a V-Sync
+
+### Entrada
+- ✅ Captura de teclado
+- 🔜 Captura de mouse (posição, botões e wheel)
+- 🔜 Detecção de eventos (keydown, keyup, etc.)
+
+### Sistema
+- 🔜 Informações sobre monitor/tela (resolução, DPI, etc.)
+- 🔜 Suporte a tempo/frame time
+
+### Futuro
+- 🔜 Suporte a áudio
+- 🔜 Manipulação de arquivos
+- 🔜 Suporte a gamepads/joysticks
+- 🔜 Compilação para macOS
+- 🔜 Sistema de logs (debug/info/warning/error)
+
+---
+
+## 🤔 Por que usar?
+
+Sinceramente? Talvez você **não deva usar**... ainda!  
+Esse projeto está em estágio inicial e ainda não é melhor que alternativas já consolidadas.  
+Porém, se você gosta de projetos pequenos, educativos e fáceis de entender, pode valer a pena dar uma olhada!  
+Toda sugestão e ajuda são bem-vindas. 😄
+
+---
+
+## 🧠 Filosofia
+
+- Código simples e modular
+- Documentação clara
+- Aprendizado em primeiro lugar
+
+---
+
+## 🖥️ Plataformas Suportadas
+
+- ✅ Windows
+- 🔜 Linux
+- 🔜 macOS (contribuições são bem-vindas!)
+
+---
+
+## 🔧 Instalação
+
+*Por enquanto, você pode clonar o repositório e compilar com CMake:*
+
+```bash
+git clone https://github.com/seu-usuario/AOCF.git
+cd AOCF
+mkdir build && cd build
+cmake ..
+make
